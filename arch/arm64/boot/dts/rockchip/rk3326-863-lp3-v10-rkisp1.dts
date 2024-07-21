@@ -1,0 +1,20 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright (c) 2019 Fuzhou Rockchip Electronics Co., Ltd
+ */
+
+/dts-v1/;
+#include "rk3326-863-lp3-v10.dtsi"
+#include "camera/rk3326-863-lp3-v10-camera-gc0312-gc2145-ov2680-gc2385-ov5648-ov8858.dtsi"
+
+/ {
+	model = "Rockchip rk3326 863 rkisp1 board";
+	compatible = "rockchip,rk3326-863-lp3-v10-rkisp1", "rockchip,rk3326";
+};
+
+&chosen {
+	bootargs_ext = "androidboot.boot_devices=ff390000.dwmmc,ff3b0000.nandc";
+};
+
+
+

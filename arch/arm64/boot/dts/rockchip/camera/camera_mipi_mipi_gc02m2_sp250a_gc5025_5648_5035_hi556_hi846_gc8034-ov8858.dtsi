@@ -1,0 +1,529 @@
+&csi2_dphy_hw {
+	status = "okay";
+};
+
+/*
+ * csi2_dphy1 & csi2_dphy2 used for split mode,
+ * csi2_dphy0 used for full mode,
+ * full mode and split mode are mutually exclusive
+ */
+
+&csi2_dphy0 {
+	status = "disabled";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		port@0 {
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			mipi_in_ucam5: endpoint@2 {
+				reg = <2>;
+				remote-endpoint = <&ov8858_out>;
+				data-lanes = <1 2 3 4>;
+			};
+		};
+		port@1 {
+			reg = <1>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			dphy0_out: endpoint@0 {
+				reg = <0>;
+				remote-endpoint = <&isp_in0>;
+			};
+		};
+	};
+};
+
+&csi2_dphy1 {
+	status = "okay";
+
+	/*
+	 * dphy1 only used for split mode,
+	 * can be used  concurrently  with dphy2
+	 * full mode and split mode are mutually exclusive
+	 */
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			mipi_in_ucam1: endpoint@1 {
+				reg = <1>;
+				remote-endpoint = <&gc5035_out>;
+				data-lanes = <1 2>;
+			};
+			mipi_in_ucam3: endpoint@2 {
+				reg = <2>;
+				remote-endpoint = <&ov5670_out>;
+				data-lanes = <1 2>;
+			};
+			mipi_in_ucam4: endpoint@4 {
+				reg = <4>;
+				remote-endpoint = <&hi556_out>;
+				data-lanes = <1 2>;
+			};
+			mipi_in_gc8034: endpoint@5 {
+				reg = <5>;
+				remote-endpoint = <&gc8034_out>;
+				data-lanes = <1 2>;
+			};
+			mipi_in_hi846: endpoint@6 {
+				reg = <6>;
+				remote-endpoint = <&hi846_out>;
+				data-lanes = <1 2>;
+			};
+			mipi_in_ov5648: endpoint@7 {
+				reg = <7>;
+				remote-endpoint = <&ov5648_out>;
+				data-lanes = <1 2>;
+			};
+			mipi_in_ov8858: endpoint@8 {
+				reg = <8>;
+				remote-endpoint = <&ov8858_out>;
+				data-lanes = <1 2>;
+			};						
+		};
+
+		port@1 {
+			reg = <1>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			dphy1_out: endpoint@1 {
+				reg = <1>;
+				remote-endpoint = <&isp_in1>;
+			};
+		};
+	};
+};
+
+&csi2_dphy2 {
+	status = "okay";
+
+	/*
+	 * dphy2 only used for split mode,
+	 * can be used  concurrently  with dphy1
+	 * full mode and split mode are mutually exclusive
+	 */
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			mipi_in_ucam0: endpoint@1 {
+				reg = <1>;
+				remote-endpoint = <&gc02m2_out>;
+				data-lanes = <1>;
+			};
+			mipi_in_ucam2: endpoint@0 {
+				reg = <0>;
+				remote-endpoint = <&sp250a_out>;
+				data-lanes = <1>;
+			};
+			mipi_in_gc5025: endpoint@2 {
+				reg = <2>;
+				remote-endpoint = <&gc5025_out>;
+				data-lanes = <1 2>;
+			};
+			mipi_in_gc030a: endpoint@3 {
+				reg = <3>;
+				remote-endpoint = <&gc030a_out>;
+				data-lanes = <1>;
+			};			
+		};
+
+		port@1 {
+			reg = <1>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			dphy2_out: endpoint@1 {
+				reg = <1>;
+				remote-endpoint = <&isp_in2>;
+			};
+		};
+	};
+};
+
+&i2c2 {
+	status = "okay";
+	pinctrl-0 = <&i2c2m1_xfer>;
+
+	dw9714: dw9714@c {
+		compatible = "dongwoon,dw9714";
+		status = "okay";
+		reg = <0x0c>;
+		rockchip,camera-module-index = <0>;
+		rockchip,vcm-start-current = <10>;
+		rockchip,vcm-rated-current = <50>;
+		rockchip,vcm-step-mode = <5>;
+		rockchip,camera-module-facing = "back";
+	};
+	
+	gc030a: gc030a@21 {
+		compatible = "galaxycore,gc030a";
+		status = "okay";
+		reg = <0x21>;
+		clocks = <&cru CLK_CIF_OUT>;
+		clock-names = "xvclk";
+		power-domains = <&power RK3568_PD_VI>;
+		//pinctrl-names = "rockchip,camera_default";
+		//pinctrl-0 = <&cam_clkout0>;
+		//reset pin control by hardware,used this pin switch to mipi input
+		//1->2LANE(LANE 0&1) FRONT camera, 0->4LANE REAR camera
+		reset-gpios = <&gpio4 RK_PB0 GPIO_ACTIVE_HIGH>;
+		pwdn-gpios = <&gpio4 RK_PB3 GPIO_ACTIVE_LOW>;
+		//pwdn2-gpios = <&gpio4 11 GPIO_ACTIVE_HIGH>;
+		rockchip,camera-module-index = <1>;
+		rockchip,camera-module-facing = "front";
+		rockchip,camera-module-name = "KYT-4877-V01";
+		rockchip,camera-module-lens-name = "default";
+		port {
+			gc030a_out: endpoint {
+				remote-endpoint = <&mipi_in_gc030a>;
+				data-lanes = <1>;
+			};
+		};
+	};
+
+	gc02m2: gc02m2@37 {
+		compatible = "galaxycore,gc02m2";
+		status = "okay";
+		reg = <0x37>;
+		clocks = <&cru CLK_CIF_OUT>;
+		clock-names = "xvclk";
+		power-domains = <&power RK3568_PD_VI>;
+		//pinctrl-names = "rockchip,camera_default";
+		//pinctrl-0 = <&cam_clkout0>;
+		//reset pin control by hardware,used this pin switch to mipi input
+		//1->2LANE(LANE 0&1) FRONT camera, 0->4LANE REAR camera
+		reset-gpios = <&gpio4 RK_PB0 GPIO_ACTIVE_HIGH>;
+		pwdn-gpios = <&gpio4 RK_PB3 GPIO_ACTIVE_LOW>;
+		//pwdn2-gpios = <&gpio4 11 GPIO_ACTIVE_HIGH>;
+		rockchip,camera-module-index = <1>;
+		rockchip,camera-module-facing = "front";
+		rockchip,camera-module-name = "KYT-4877-V01";
+		rockchip,camera-module-lens-name = "default";
+		port {
+			gc02m2_out: endpoint {
+				remote-endpoint = <&mipi_in_ucam0>;
+				data-lanes = <1>;
+			};
+		};
+	};
+
+	gc5035: gc5035@37 {
+		status = "okay";
+		compatible = "galaxycore,gc5035";
+		reg = <0x37>;
+		clocks = <&cru CLK_CIF_OUT>;
+		clock-names = "xvclk";
+		power-domains = <&power RK3568_PD_VI>;
+		//pinctrl-names = "default";
+		//pinctrl-0 = <&cam_clkout0>;
+		//reset pin control by hardware,used this pin switch to mipi input
+		//1->2LANE(LANE 0&1) FRONT camera, 0->4LANE REAR camera
+		reset-gpios = <&gpio4 RK_PA7 GPIO_ACTIVE_HIGH>; //for VCM power used
+		pwdn-gpios = <&gpio4 RK_PB2 GPIO_ACTIVE_HIGH>;
+		//pwdn2-gpios = <&gpio4 10 GPIO_ACTIVE_HIGH>;
+		rockchip,camera-module-index = <0>;
+		rockchip,camera-module-facing = "back";
+		rockchip,camera-module-name = "KYT-4877-V01";
+		rockchip,camera-module-lens-name = "default";
+		flash-leds = <&flash_rgb13h>;
+		lens-focus = <&dw9714>;
+		port {
+			gc5035_out: endpoint {
+				remote-endpoint = <&mipi_in_ucam1>;
+				data-lanes = <1 2>;
+			};
+		};
+	};
+
+	sp250a: sp250a@3c {
+		compatible = "superpix,sp250a";
+		status = "okay";
+		reg = <0x3c>;
+		clocks = <&cru CLK_CIF_OUT>;
+		clock-names = "xvclk";
+		power-domains = <&power RK3568_PD_VI>;
+		//pinctrl-names = "rockchip,camera_default";
+		//pinctrl-0 = <&cam_clkout0>;
+		//reset pin control by hardware,used this pin switch to mipi input
+		//1->2LANE(LANE 0&1) FRONT camera, 0->4LANE REAR camera
+		reset-gpios = <&gpio4 RK_PB0 GPIO_ACTIVE_HIGH>;
+		pwdn-gpios = <&gpio4 RK_PB3 GPIO_ACTIVE_HIGH>;
+		//pwdn2-gpios = <&gpio4 11 GPIO_ACTIVE_HIGH>;
+		rockchip,camera-module-index = <1>;
+		rockchip,camera-module-facing = "front";
+		rockchip,camera-module-name = "LM50A60-S107-YK-XJL-V2";
+		rockchip,camera-module-lens-name = "default";
+		port {
+			sp250a_out: endpoint {
+				remote-endpoint = <&mipi_in_ucam2>;
+				data-lanes = <1>;
+			};
+		};
+	};
+
+	ov5670: ov5670@36 {
+		status = "okay";
+		compatible = "ovti,ov5670";
+		reg = <0x36>;
+		clocks = <&cru CLK_CIF_OUT>;
+		clock-names = "xvclk";
+		power-domains = <&power RK3568_PD_VI>;
+		//pinctrl-names = "default";
+		//pinctrl-0 = <&cam_clkout0>;
+		//reset pin control by hardware,used this pin switch to mipi input
+		//1->2LANE(LANE 0&1) FRONT camera, 0->4LANE REAR camera
+		reset-gpios = <&gpio4 RK_PA7 GPIO_ACTIVE_HIGH>; //for VCM power used
+		pwdn-gpios = <&gpio4 RK_PB2 GPIO_ACTIVE_HIGH>;
+		//pwdn2-gpios = <&gpio4 10 GPIO_ACTIVE_HIGH>;
+		rockchip,camera-module-index = <0>;
+		rockchip,camera-module-facing = "back";
+		rockchip,camera-module-name = "LM50A60-S107-YK-XJL-V2";
+		rockchip,camera-module-lens-name = "default";
+		flash-leds = <&flash_rgb13h>;
+		lens-focus = <&dw9714>;
+		port {
+			ov5670_out: endpoint {
+				remote-endpoint = <&mipi_in_ucam3>;
+				data-lanes = <1 2>;
+			};
+		};
+	};
+
+	hi556: hi556@20 {
+		status = "okay";
+		compatible = "Hynix,hi556";
+		reg = <0x20>;
+		clocks = <&cru CLK_CIF_OUT>;
+		clock-names = "xvclk";
+		power-domains = <&power RK3568_PD_VI>;
+		//pinctrl-names = "default";
+		//pinctrl-0 = <&cam_clkout0>;
+		//reset pin control by hardware,used this pin switch to mipi input
+		//1->2LANE(LANE 0&1) FRONT camera, 0->4LANE REAR camera
+		reset-gpios = <&gpio4 RK_PA7 GPIO_ACTIVE_HIGH>;	//for VCM power used
+		pwdn-gpios = <&gpio4 RK_PB2 GPIO_ACTIVE_HIGH>;
+		//pwdn2-gpios = <&gpio4 10 GPIO_ACTIVE_HIGH>;
+		rockchip,camera-module-index = <0>;
+		rockchip,camera-module-facing = "back";
+		rockchip,camera-module-name = "KYT-8607-V1.0";
+		rockchip,camera-module-lens-name = "default";
+		flash-leds = <&flash_rgb13h>;
+		lens-focus = <&dw9714>;
+		port {
+			hi556_out: endpoint {
+				remote-endpoint = <&mipi_in_ucam4>;
+				data-lanes = <1 2>;
+			};
+		};
+	};
+
+	gc5025: gc5025@37 {
+		compatible = "galaxycore,gc5025";
+		status = "okay";
+		reg = <0x37>;
+		clocks = <&cru CLK_CIF_OUT>;
+		clock-names = "xvclk";
+		power-domains = <&power RK3568_PD_VI>;
+		//pinctrl-names = "rockchip,camera_default";
+		//pinctrl-0 = <&cam_clkout0>;
+		reset-gpios = <&gpio4 RK_PB0 GPIO_ACTIVE_LOW>;
+		pwdn-gpios = <&gpio4 RK_PB3 GPIO_ACTIVE_LOW>;
+		//pwdn2-gpios = <&gpio4 11 GPIO_ACTIVE_HIGH>;
+		rockchip,camera-module-index = <1>;
+		rockchip,camera-module-facing = "front";
+		rockchip,camera-module-name = "KYT-8647-V1.0";
+		rockchip,camera-module-lens-name = "default";
+		port {
+			gc5025_out: endpoint {
+				remote-endpoint = <&mipi_in_gc5025>;
+				data-lanes = <1 2>;
+			};
+		};
+	};
+
+	gc8034: gc8034@37 {
+		status = "okay";
+		compatible = "galaxycore,gc8034";
+		reg = <0x37>;
+		clocks = <&cru CLK_CIF_OUT>;
+		clock-names = "xvclk";
+		power-domains = <&power RK3568_PD_VI>;
+		//pinctrl-names = "default";
+		//pinctrl-0 = <&cam_clkout0>;
+		reset-gpios = <&gpio4 RK_PA7 GPIO_ACTIVE_LOW>; //for VCM power used
+		pwdn-gpios = <&gpio4 RK_PB2 GPIO_ACTIVE_LOW>;
+		//pwdn2-gpios = <&gpio4 10 GPIO_ACTIVE_LOW>;
+		rockchip,camera-module-index = <0>;
+		rockchip,camera-module-facing = "back";
+		rockchip,camera-module-name = "KYT-8647-V1.0";
+		rockchip,camera-module-lens-name = "default";
+		flash-leds = <&flash_rgb13h>;
+		lens-focus = <&dw9714>;
+		port {
+			gc8034_out: endpoint {
+				remote-endpoint = <&mipi_in_gc8034>;
+				data-lanes = <1 2>;
+			};
+		};
+	};
+
+
+	ov8858: ov8858@36 {
+		status = "okay";
+		compatible = "ovti,ov8858";
+		reg = <0x36>;
+		clocks = <&cru CLK_CIF_OUT>;
+		clock-names = "xvclk";
+		power-domains = <&power RK3568_PD_VI>;
+		//pinctrl-names = "rockchip,camera_default", "rockchip,camera_sleep";
+		//pinctrl-0 = <&cam_clkout0>;
+		//pinctrl-1 = <&cam_sleep>;
+		//reset pin control by hardware,used this pin switch to mipi input
+		//1->2LANE(LANE 0&1) FRONT camera, 0->4LANE REAR camera
+		reset-gpios = <&gpio4 RK_PB1 GPIO_ACTIVE_HIGH>;
+		pwdn-gpios = <&gpio4 RK_PB2 GPIO_ACTIVE_HIGH>;
+		rockchip,camera-module-index = <0>;
+		rockchip,camera-module-facing = "back";
+		rockchip,camera-module-name = "HS5885-BNSM1018-V01";
+		rockchip,camera-module-lens-name = "default";
+		flash-leds = <&flash_rgb13h>;
+		lens-focus = <&dw9714>;
+		port {
+			ov8858_out: endpoint {
+				remote-endpoint = <&mipi_in_ov8858>;
+				data-lanes = <1 2>;
+			};
+		};
+	};
+	
+#if 0
+	gc5025: gc5025@37 {
+		compatible = "galaxycore,gc5025";
+		status = "okay";
+		reg = <0x37>;
+		clocks = <&cru CLK_CIF_OUT>;
+		clock-names = "xvclk";
+		power-domains = <&power RK3568_PD_VI>;
+		//pinctrl-names = "rockchip,camera_default";
+		//pinctrl-0 = <&cam_clkout0>;
+		reset-gpios = <&gpio4 RK_PB0 GPIO_ACTIVE_LOW>;
+		pwdn-gpios = <&gpio4 RK_PB3 GPIO_ACTIVE_LOW>;
+		//pwdn2-gpios = <&gpio4 11 GPIO_ACTIVE_HIGH>;
+		rockchip,camera-module-index = <1>;
+		rockchip,camera-module-facing = "front";
+		rockchip,camera-module-name = "KYT-8648-V1.0";
+		rockchip,camera-module-lens-name = "default";
+		port {
+			gc5025_out: endpoint {
+				remote-endpoint = <&mipi_in_gc5025>;
+				data-lanes = <1 2>;
+			};
+		};
+	};
+#endif
+	hi846: hi846@20 {
+		status = "okay";
+		compatible = "Hynix,hi846";
+		reg = <0x20>;
+		clocks = <&cru CLK_CIF_OUT>;
+		clock-names = "xvclk";
+		power-domains = <&power RK3568_PD_VI>;
+		//pinctrl-names = "default";
+		//pinctrl-0 = <&cam_clkout0>;
+		//reset pin control by hardware,used this pin switch to mipi input
+		//1->2LANE(LANE 0&1) FRONT camera, 0->4LANE REAR camera
+		reset-gpios = <&gpio4 RK_PA7 GPIO_ACTIVE_HIGH>;	//for VCM power used
+		pwdn-gpios = <&gpio4 RK_PB2 GPIO_ACTIVE_HIGH>;
+		//pwdn2-gpios = <&gpio4 10 GPIO_ACTIVE_HIGH>;
+		rockchip,camera-module-index = <0>;
+		rockchip,camera-module-facing = "back";
+		rockchip,camera-module-name = "KYT-8648-V1.0";
+		rockchip,camera-module-lens-name = "default";
+		flash-leds = <&flash_rgb13h>;
+		lens-focus = <&dw9714>;
+		port {
+			hi846_out: endpoint {
+				remote-endpoint = <&mipi_in_hi846>;
+				data-lanes = <1 2>;
+			};
+		};
+	};
+
+	ov5648: ov5648@36 {
+		status = "okay";
+		compatible = "ovti,ov5648";
+		reg = <0x36>;
+		clocks = <&cru CLK_CIF_OUT>;
+		clock-names = "xvclk";
+		power-domains = <&power RK3568_PD_VI>;
+		//pinctrl-names = "default";
+		//pinctrl-0 = <&cam_clkout0>;
+		//reset pin control by hardware,used this pin switch to mipi input
+		//1->2LANE(LANE 0&1) FRONT camera, 0->4LANE REAR camera
+		reset-gpios = <&gpio4 RK_PB1 GPIO_ACTIVE_HIGH>;
+		pwdn-gpios = <&gpio4 RK_PB2 GPIO_ACTIVE_HIGH>;
+		//pwdn2-gpios = <&gpio4 10 GPIO_ACTIVE_HIGH>;
+		rockchip,camera-module-index = <0>;
+		rockchip,camera-module-facing = "back";
+		rockchip,camera-module-name = "HS5885-BNSM1018-V01";
+		rockchip,camera-module-lens-name = "default";
+		flash-leds = <&flash_rgb13h>;
+		lens-focus = <&dw9714>;
+		port {
+			ov5648_out: endpoint {
+				remote-endpoint = <&mipi_in_ov5648>;
+				data-lanes = <1 2>;
+			};
+		};
+	};
+
+};
+
+&rkisp {
+	status = "okay";
+};
+
+&rkisp_mmu {
+	status = "okay";
+};
+
+&rkisp_vir0 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&cif_clk>;
+	port {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		isp_in0: endpoint@0 {
+			reg = <0>;
+			remote-endpoint = <&dphy0_out>;
+		};
+		isp_in1: endpoint@1 {
+			reg = <1>;
+			remote-endpoint = <&dphy1_out>;
+		};		
+		isp_in2: endpoint@2 {
+			reg = <1>;
+			remote-endpoint = <&dphy2_out>;
+		};
+	};
+};
+

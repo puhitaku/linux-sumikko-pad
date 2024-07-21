@@ -1,0 +1,383 @@
+/*
+* incar camera
+*/
+
+/ {
+       flash_rgb13h: flash-rgb13h {
+		   compatible = "led,rgb13h";
+		   label = "gpio-flash";
+		   led-max-microamp = <20000>;
+		   flash-max-microamp = <20000>;
+		   flash-max-timeout-us = <1000000>;
+		   enable-gpio = <&gpio0 11 GPIO_ACTIVE_HIGH>;
+		   rockchip,camera-module-index = <0>;
+		   rockchip,camera-module-facing = "back";
+       };      
+};
+
+&i2c2 {
+	status = "okay";
+	fp5510: fp5510@0c {
+		compatible = "fitipower touch,fp5510";
+		status = "okay";
+		reg = <0x0c>;
+		pwdn-gpios = <&gpio2 12 GPIO_ACTIVE_HIGH>;
+		rockchip,vcm-start-current = <18>;
+		rockchip,vcm-rated-current = <30>;
+		rockchip,vcm-setp-mode = <13>;
+		rockchip,camera-module-index = <0>;
+		rockchip,camera-module-facing = "back";
+	};
+
+	gc0312@21 {
+		status = "okay";
+		compatible = "galaxycore,gc0312";
+		reg = <0x21>;
+		clocks = <&cru SCLK_CIF_OUT>;
+		clock-names = "xvclk";
+
+		avdd-supply = <&vcc2v8_dvp>;
+		dovdd-supply = <&vcc1v8_dvp>;
+		dvdd-supply = <&vcc1v8_dvp>;
+
+		pwdn-gpios = <&gpio2 14 GPIO_ACTIVE_HIGH>;
+                rockchip,camera-module-index = <1>;
+                rockchip,camera-module-facing = "front";
+                rockchip,camera-module-name = "KYT-3359-V5.0";
+                rockchip,camera-module-lens-name = "M216A-233";
+
+		port {
+			gc0312_out: endpoint {
+				remote-endpoint = <&dvp_in_fcam>;
+			};
+		};
+	};
+
+	gc2145@3c {
+		status = "okay";
+		compatible = "galaxycore,gc2145";
+		reg = <0x3c>;
+		//pinctrl-names = "default";
+		//pinctrl-0 = <&cif_clkout_m0 &dvp_d0d1_m0 &dvp_d2d9_m0 &dvp_d10d11_m0>;
+
+		clocks = <&cru SCLK_CIF_OUT>;
+		clock-names = "xvclk";
+
+		avdd-supply = <&vcc2v8_dvp>;
+		dovdd-supply = <&vcc1v8_dvp>;
+		dvdd-supply = <&vcc1v8_dvp>;
+
+		pwdn-gpios = <&gpio2 14 GPIO_ACTIVE_HIGH>;
+        rockchip,camera-module-index = <1>;
+        rockchip,camera-module-facing = "front";
+        rockchip,camera-module-name = "default";
+        rockchip,camera-module-lens-name = "default";
+
+		port {
+			gc2145_out: endpoint {
+				remote-endpoint = <&dvp_in_fcam1>;
+			};
+		};
+	};
+
+	gc032a@21 {
+		status = "okay";
+		compatible = "galaxycore,gc032a";
+		reg = <0x21>;
+		clocks = <&cru SCLK_CIF_OUT>;
+		clock-names = "xvclk";
+
+		avdd-supply = <&vcc2v8_dvp>;
+		dovdd-supply = <&vcc1v8_dvp>;
+		dvdd-supply = <&vcc1v8_dvp>;
+
+		pwdn-gpios = <&gpio2 14 GPIO_ACTIVE_HIGH>;
+        rockchip,camera-module-index = <1>;
+        rockchip,camera-module-facing = "front";
+        rockchip,camera-module-name = "KYT-3359-V5.0";
+        rockchip,camera-module-lens-name = "M216A-233";
+
+		port {
+			gc032a_out: endpoint {
+				remote-endpoint = <&dvp_in_fcam2>;
+			};
+		};
+	};
+	
+	ov2680@10 {
+		status = "okay";
+		compatible = "ovti,ov2680";
+		reg = <0x36>;//reg = <0x10>;  i2c地址向右移动1位 0x10--0x20     0x36--0x6c 
+		clocks = <&cru SCLK_CIF_OUT>;
+		clock-names = "xvclk";
+		
+		avdd-supply = <&vcc2v8_dvp>;
+		dovdd-supply = <&vcc1v8_dvp>;
+		dvdd-supply = <&vdd1v5_dvp>;
+
+		pwdn-gpios = <&gpio2 13 GPIO_ACTIVE_HIGH>;
+
+                rockchip,camera-module-index = <0>;
+                rockchip,camera-module-facing = "back";
+                rockchip,camera-module-name = "KYT-3359-V5.0";
+                rockchip,camera-module-lens-name = "M216A-233";
+		flash-leds = <&flash_rgb13h>;
+		port {
+			ucam_out: endpoint {
+				remote-endpoint = <&mipi_in_ucam>;
+				data-lanes = <1>;
+			};
+		};
+	};
+	
+	
+	gc2385@37 {
+		status = "okay";
+		compatible = "galaxycore,gc2385";
+		reg = <0x37>;
+		clocks = <&cru SCLK_CIF_OUT>;
+		clock-names = "xvclk";
+		
+		avdd-supply = <&vcc2v8_dvp>;
+		dovdd-supply = <&vcc1v8_dvp>;
+		dvdd-supply = <&vdd1v5_dvp>;
+
+		pwdn-gpios = <&gpio2 13 GPIO_ACTIVE_HIGH>;
+
+        rockchip,camera-module-index = <0>;
+		rockchip,camera-module-facing = "back";
+		rockchip,camera-module-name = "KYT-4497";
+		rockchip,camera-module-lens-name = "M2116A-233";
+	//	flash-leds = <&flash_rgb13h>;
+		port {
+			ucam_out2: endpoint {
+				remote-endpoint = <&mipi_in_ucam2>;
+				data-lanes = <1>;
+			};
+		};
+	};	
+	
+	ov5648@36 {
+		status = "okay";
+		compatible = "ovti,ov5648";
+		reg = <0x36>;
+		clocks = <&cru SCLK_CIF_OUT>;
+		clock-names = "xvclk";
+		
+		avdd-supply = <&vcc2v8_dvp>;
+		dovdd-supply = <&vcc1v8_dvp>;
+	//	dvdd-supply = <&vcc1v8_dvp>;
+
+		pwdn-gpios = <&gpio2 13 GPIO_ACTIVE_HIGH>;
+	//	pinctrl-names = "default";
+	//	pinctrl-0 = <&cif_clkout_m0>;
+		rockchip,camera-module-index = <0>;
+        rockchip,camera-module-facing = "back";
+        rockchip,camera-module-name = "default";
+        rockchip,camera-module-lens-name = "default";
+		//lens-focus = <&fp5510>;
+		port {
+			ucam_out3: endpoint {
+				remote-endpoint = <&mipi_in_ucam3>;
+				data-lanes = <1 2>;
+			};
+		};
+	};
+
+	ov8858@36 {
+		status = "okay";
+		compatible = "ovti,ov8858";
+		reg = <0x36>;
+		clocks = <&cru SCLK_CIF_OUT>;
+		clock-names = "xvclk";
+		
+		avdd-supply = <&vcc2v8_dvp>;
+		dovdd-supply = <&vcc1v8_dvp>;
+		dvdd-supply = <&vdd1v5_dvp>;
+
+		pwdn-gpios = <&gpio2 13 GPIO_ACTIVE_HIGH>;
+	//	pinctrl-names = "default";
+	//	pinctrl-0 = <&cif_clkout_m0>;
+		rockchip,camera-module-index = <0>;
+        rockchip,camera-module-facing = "back";
+        rockchip,camera-module-name = "CameraKing";
+        rockchip,camera-module-lens-name = "Largan-9569A2";
+		//lens-focus = <&fp5510>;
+		port {
+			ucam_out4: endpoint {
+				remote-endpoint = <&mipi_in_ucam4>;
+				data-lanes = <1 2 3 4>;
+			};
+		};
+	};	
+	
+	gc02m2@37 {
+		status = "okay";
+		compatible = "galaxycore,gc02m2";
+		reg = <0x37>;
+		clocks = <&cru SCLK_CIF_OUT>;
+		clock-names = "xvclk";
+ 		
+		avdd-supply = <&vcc2v8_dvp>;
+		dovdd-supply = <&vcc1v8_dvp>;
+		dvdd-supply = <&vdd1v5_dvp>;
+
+		pwdn-gpios = <&gpio2 13 GPIO_ACTIVE_HIGH>;
+
+        rockchip,camera-module-index = <0>;
+		rockchip,camera-module-facing = "back";
+		rockchip,camera-module-name = "KYT-8070";
+        rockchip,camera-module-lens-name = "M2116A-233";
+	//	flash-leds = <&flash_rgb13h>;
+		port {
+			ucam_out5: endpoint {
+				remote-endpoint = <&mipi_in_ucam5>;
+				data-lanes = <1>;
+			};
+		};
+	};
+			
+};
+
+&isp_mmu {
+	status = "okay";
+};
+
+&rkisp1 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&cif_clkout_m0  &dvp_d2d9_m0 >;
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		port@0 {
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			isp0_mipi_in: endpoint@0 {
+			reg = <0>;
+			remote-endpoint = <&dphy_rx0_out>; 
+			};
+	    };
+	     
+	     
+		port@1 {
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			dvp_in_fcam: endpoint@0 {
+				reg = <0>;
+				remote-endpoint = <&gc0312_out>;
+			};
+	    };	
+
+		port@2 {
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			dvp_in_fcam1: endpoint@0 {
+				reg = <0>;
+				remote-endpoint = <&gc2145_out>;
+			};
+	    };
+
+			
+		port@3 {
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			dvp_in_fcam2: endpoint@0 {
+				reg = <0>;
+				remote-endpoint = <&gc032a_out>;
+			};
+	    };	
+		
+	};
+};
+
+
+&mipi_dphy_rx0 {
+	status = "okay";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			mipi_in_ucam: endpoint@1 {
+				reg = <0>;
+				remote-endpoint = <&ucam_out>;
+				data-lanes = <1>;
+			};
+		};
+			
+		port@1 {
+			reg = <1>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			dphy_rx0_out: endpoint@0 {
+				reg = <0>;
+				remote-endpoint = <&isp0_mipi_in>;
+			};
+		};
+		
+		
+		port@2 {
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			mipi_in_ucam2: endpoint@2 {
+				reg = <0>;
+				remote-endpoint = <&ucam_out2>;
+				data-lanes = <1>;
+			};
+		};		
+
+		port@3 {
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			mipi_in_ucam3: endpoint@3 {
+				reg = <0>;
+				remote-endpoint = <&ucam_out3>;
+				data-lanes = <1  2>;
+			};
+		};			
+
+		port@4 {
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			mipi_in_ucam4: endpoint@4 {
+				reg = <0>;
+				remote-endpoint = <&ucam_out4>;
+				data-lanes = <1 2 3 4>;
+			};
+		};
+
+		port@5 {
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			mipi_in_ucam5: endpoint@5 {
+				reg = <0>;
+				remote-endpoint = <&ucam_out5>;
+				data-lanes = <1>;
+			};
+		};	
+		
+	};	
+};
